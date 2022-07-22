@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="log.base.dir">/var/log/upwork/zendesk-doc-importer</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="console.appender" target="SYSTEM_OUT">
+			<PatternLayout pattern="%d %p [%t] %m%n"/>
+		</Console>
+
+		<RollingFile name="main.appender" fileName="${log.base.dir}/app.log">
+			<FilePattern>${log.base.dir}/app[i].log</FilePattern>
+			<Append>true</Append>
+			<SizeBasedTriggeringPolicy size="10MB"/>
+			<DefaultRolloverStrategy max="50" />
+			<PatternLayout pattern="%d %p [%t] %m%n"/>
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+		<Root level="INFO">
+			<appender-ref ref="console.appender"/>
+			<appender-ref ref="main.appender"/>
+		</Root>
+
+		<!-- convert-pdfa -->
+		<Logger level="INFO" name="co.citizenlab"/>
+	</Loggers>
+</Configuration>
