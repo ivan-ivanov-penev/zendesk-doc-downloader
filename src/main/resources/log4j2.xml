@@ -16,6 +16,22 @@
 			<DefaultRolloverStrategy max="50" />
 			<PatternLayout pattern="%d %p [%t] %m%n"/>
 		</RollingFile>
+
+		<RollingFile name="missing.docs.appender" fileName="${log.base.dir}/missing-documents.csv">
+			<FilePattern>${log.base.dir}/missing-documents[i].csv</FilePattern>
+			<Append>false</Append>
+			<SizeBasedTriggeringPolicy size="100MB"/>
+			<DefaultRolloverStrategy max="50" />
+			<PatternLayout pattern="%m%n"/>
+		</RollingFile>
+
+		<RollingFile name="missing.calls.appender" fileName="${log.base.dir}/missing-calls.csv">
+			<FilePattern>${log.base.dir}/missing-calls[i].csv</FilePattern>
+			<Append>false</Append>
+			<SizeBasedTriggeringPolicy size="100MB"/>
+			<DefaultRolloverStrategy max="50" />
+			<PatternLayout pattern="%m%n"/>
+		</RollingFile>
 	</Appenders>
 
 	<Loggers>
@@ -24,7 +40,17 @@
 			<appender-ref ref="main.appender"/>
 		</Root>
 
-		<!-- convert-pdfa -->
+		<!-- main -->
 		<Logger level="INFO" name="co.citizenlab"/>
+
+		<!-- missing documents -->
+		<Logger level="INFO" name="missing.docs" additivity="false">
+			<appender-ref ref="missing.docs.appender"/>
+		</Logger>
+
+		<!-- missing calls -->
+		<Logger level="INFO" name="missing.calls" additivity="false">
+			<appender-ref ref="missing.calls.appender"/>
+		</Logger>
 	</Loggers>
 </Configuration>
