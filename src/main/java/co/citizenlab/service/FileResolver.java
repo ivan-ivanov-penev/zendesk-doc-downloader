@@ -65,7 +65,7 @@ public class FileResolver {
 
     public String resolveCallName(Call call, String resourceName) throws Exception {
 
-        String parentDir = createParentDirsOnAbsence("calls", resourceName);
+        String parentDir = createParentDirsOnAbsence("call", resourceName);
 
         return parentDir + "/" + call.madeAt;
     }

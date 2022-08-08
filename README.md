@@ -4,8 +4,9 @@ The `zendesk-doc-downloader` application is used for downloading all
 [documents](https://developer.zendesk.com/api-reference/sales-crm/resources/documents) from the Zendesk REST API (which 
 is currently 'v2'). This is done by searching all 
 [lead](https://developer.zendesk.com/api-reference/sales-crm/resources/leads), 
-[contact](https://developer.zendesk.com/api-reference/sales-crm/resources/contacts) and 
-[deal](https://developer.zendesk.com/api-reference/sales-crm/resources/deals) resources for the corresponding documents. 
+[contact](https://developer.zendesk.com/api-reference/sales-crm/resources/contacts),  
+[deal](https://developer.zendesk.com/api-reference/sales-crm/resources/deals) and
+[call](https://developer.zendesk.com/api-reference/sales-crm/resources/calls) resources for the corresponding documents. 
 The full documentation can be found [here](https://developer.zendesk.com/documentation "Zendesk API documentation") 
 
 ---
@@ -39,8 +40,18 @@ The document structure in the configurable output directory will be crated as fo
   `FULL-NAME-AND-ORGANIZATION-NAME-OF-LEAD` is obtained from the Zendesk API and corresponds to the lead of the 
   according document.
 * All documents belonging to the 'contact' resource type are placed under
-  `${docs.dir.base}/contact/${FULL-NAME-AND-NAME-OF-LEAD}/${ORIGINAL-DOC-NAME}` where the `FULL-NAME-AND-NAME-OF-LEAD` 
-  is obtained from the Zendesk API and corresponds to the contact of the according document.
+  `${docs.dir.base}/contact/${FULL-NAME-AND-NAME-OF-CONTACT}/${ORIGINAL-DOC-NAME}` where the 
+  `FULL-NAME-AND-NAME-OF-CONTACT` is obtained from the Zendesk API and corresponds to the contact of the according 
+  document.
+* All call recordings are stored under a directory called 'call' and inside if the call is associated to a resource of
+  type 'contact' a subdirectory named after the name of the 'contact' is created, if it's associated to a resource of 
+  type 'lead' then the subdirectory is named after that 'lead' or alternately it's called '00_UNKNOWN' if it's not 
+  associated with any resource. Inside for the name of the recording file its created-date is used. Optionally if there 
+  is a summary provided to this call that summary is extracted into a separate TXT file consisting with the created-date 
+  of the recording followed by a `-summary.txt` suffix. The final 'call' structure looks like this: 
+  `${docs.dir.base}/call/${FULL-NAME-AND-NAME-OF-CONTACT/LEAD}/${CREATED-DATE}.wav` or in some cases:
+  `${docs.dir.base}/call/00_UNKNOWN/${CREATED-DATE}.wav` and in case of the summary file:
+  `${docs.dir.base}/call/00_UNKNOWN/${CREATED-DATE}-summary.txt`
 
 In all of the above cases the `${ORIGINAL-DOC-NAME}` is the original name of the document (with extension) with which it 
 was stored when uploaded to Zendesk. Naturally it is obtained through the Zendesk API.
@@ -50,6 +61,12 @@ This will result in the following example structure:
 ```
 ${docs.dir.base}
 │
+├── call
+│   ├── Jeff-Bezos-Amazon
+│   │   ├── 2019-03-06T14:39:10Z.wav
+│   │   └── 2019-03-06T14:39:10Z-summary.txt
+│   └── 00_UNKNOWN
+│       └── 2021-08-19T11:06:22Z.wav
 ├── contact
 │   ├── Elon-Musk-Tesla
 │   │   └── bank-account-details.docx
@@ -77,7 +94,9 @@ includes 'file_name', 'file_size', 'download_url' etc., and second is using the 
 itself. For some documents the 'download_url' returns HTTP status 404 'Not Found' (which means that either the URL is 
 broken or the document is lost). For such documents there is little the application can do - this is an issue which can 
 be resolved only by Zendesk. Information about such documents is logged in a CSV format into a separate log file called 
-`missing-documents.csv` in the configurable root logging directory (check the full logging configuration in
+`missing-documents.csv` in the configurable root logging directory. Alternately for the broken call links the file is 
+called `missing-calls.csv` and it consists of the fields 'made_at', 'summary', 'resourceName' (which the name of its 
+associated resource /e.g. contact or lead/ if any) and 'recording_url' (check the full logging configuration in the
 [log4j2.xml](src/main/resources/log4j2.xml) configuration file).
 
 ---
